@@ -1,6 +1,8 @@
 # tak-letsencrypt-domain-setup-script
 Auotmation script to setup certbot to manage free SSL encryption from letsencrypt on your TAK server, which will allow you to use cert enrollment without having to hand out a truststore file. This will also allow ITAK users to connect to your server with QR code or hardcoded creds.
 
+Make sure you have setup cert. enrollment using this first: https://github.com/atakhq/tak-cert-enrollment-script
+
 Run this to stage the scripts locally
 ``` 
 cd /tmp/ && git clone https://github.com/atakhq/tak-letsencrypt-domain-setup-script.git && sudo chmod -R +x * /tmp/tak-letsencrypt-domain-setup-script/
