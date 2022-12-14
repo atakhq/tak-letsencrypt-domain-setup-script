@@ -21,7 +21,9 @@ read -p "Press any key to resume setup..."
 
 echo "What is your domain name? (ex: atakhq.com | tak-public.atakhq.com )"
 read FQDN
-
+echo "What is your hostname? (ex: atakhq-com | tak-public-atakhq-com )"
+echo "** Suggest using same value you entered for domain name but replace . with -"
+read HOSTNAME
 
 #dry run renew the cert make sure no issues
 sudo certbot renew --dry-run
@@ -30,37 +32,45 @@ sudo certbot renew --dry-run
 #login to new root shell and cd to root
 sudo -i
 
-openssl pkcs12 -export -in /etc/letsencrypt/live/tak.atakhq.com/fullchain.pem -inkey /etc/letsencrypt/live/tak.atakhq.com/privkey.pem -name tak-atakhq-com -out ~/tak-atakhq-com.p12
+openssl pkcs12 -export -in /etc/letsencrypt/live/$FQDN/fullchain.pem -inkey /etc/letsencrypt/live/$FQDN/privkey.pem -name $HOSTNAME -out ~/$HOSTNAME.p12
 
 sudo apt install openjdk-16-jre-headless -y
 
-keytool -importkeystore -deststorepass atakatak -destkeystore ~/tak-atakhq-com.jks -srckeystore ~/tak-atakhq-com.p12 -srcstoretype PKCS12
+read -p "If asked to save file becuase an existing copy exists, reply Y"
 
-keytool -import -alias bundle -trustcacerts -file /etc/letsencrypt/live/tak.atakhq.com/fullchain.pem -keystore ~/tak-atakhq-com.jks
+keytool -importkeystore -deststorepass atakatak -destkeystore ~/$HOSTNAME.jks -srckeystore ~/$HOSTNAME.p12 -srcstoretype PKCS12
 
-y when prompted to add bc one already exists
+keytool -import -alias bundle -trustcacerts -file /etc/letsencrypt/live/$FQDN/fullchain.pem -keystore ~/$HOSTNAME.jks
 
-cp ~/tak-atakhq-com.jks /home/tak/tak-server/tak/certs/letsencrypt
-cp ~/tak-atakhq-com.p12 /home/tak/tak-server/tak/certs/letsencrypt
+
+#copy files to common folder
+sudo mkdir /home/tak/tak-server/tak/certs/letsencrypt
+sudo cp ~/$HOSTNAME.jks /home/tak/tak-server/tak/certs/letsencrypt
+sudo cp ~/$HOSTNAME.p12 /home/tak/tak-server/tak/certs/letsencrypt
 
 sudo chown tak:tak -R /home/tak/tak-server/tak/certs/letsencrypt
 
 
-#Remove old CA config
-sed -i '65d' /opt/tak/CoreConfig.xml
+#Remove old config line
+sed -i '8d' /opt/tak/CoreConfig.xml
 
-#Add new CA Config
-sed -i '64 a\        <TAKServerCAConfig keystore="JKS" keystoreFile="/opt/tak/certs/files/intermediate-CA-signing.jks" keystorePass="atakatak" validityDays="30" signatureAlg="SHA256WithRSA"/>' /opt/tak/CoreConfig.xml
+#Add new Config line
+sed -i '7 a\        <connector port="8446" clientAuth="false" _name="cert_https" truststorePass="atakatak" truststoreFile="certs/files/truststore-intermediate-CA.jks" truststore="JKS" keystorePass="atakatak" keystoreFile="certs/letsencrypt/$HOSTNAME.jks" keystore="JKS"/>' /opt/tak/CoreConfig.xml
 
-
+#Make our changes live
+cd /home/tak/tak-server/
+docker-compose down
+service docker restart
+docker-compose up -d
 
 echo ""
 echo "***************************************************************************"
 echo "***************************************************************************"
-echo "Setup Complete: "
-echo "Please exit the docker container and then run the post-install script." 
-echo "exit"
-echo "cd /tmp/tak-cert-enrollment-script/ && chmod +x * && . certEnrollPostInstallScript.sh"
+echo "Setup Complete! Please give the docker instance a few minutes to wake up before accessing the server."
+echo "You should now be able to authenticate ITAK and ATAK clients using only user/password and server URL."
 echo ""
+echo "Server Address: $FDQN:8089 (SSL)"
+echo ""
+echo "Create new users here: https://$FDQN:8446/user-management/index.html#!/"
 echo "***************************************************************************"
 echo "***************************************************************************"
