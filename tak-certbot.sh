@@ -52,10 +52,10 @@ sudo chown tak:tak -R /home/tak/tak-server/tak/certs/letsencrypt
 
 
 #Remove old config line
-sed -i '8d' /opt/tak/CoreConfig.xml
+sed -i '8d' /home/tak/tak-server/tak/CoreConfig.xml
 
 #Add new Config line
-sed -i '7 a\        <connector port="8446" clientAuth="false" _name="cert_https" truststorePass="atakatak" truststoreFile="certs/files/truststore-intermediate-CA.jks" truststore="JKS" keystorePass="atakatak" keystoreFile="certs/letsencrypt/$HOSTNAME.jks" keystore="JKS"/>' /opt/tak/CoreConfig.xml
+sed -i '7 a\        <connector port="8446" clientAuth="false" _name="cert_https" truststorePass="atakatak" truststoreFile="certs/files/truststore-intermediate-CA.jks" truststore="JKS" keystorePass="atakatak" keystoreFile="certs/letsencrypt/$HOSTNAME.jks" keystore="JKS"/>' /home/tak/tak-server/tak/CoreConfig.xml
 
 #Make our changes live
 cd /home/tak/tak-server/
