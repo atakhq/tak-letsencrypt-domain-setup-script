@@ -18,6 +18,7 @@ read -p "Press any key to resume setup..."
 
 echo "What is your domain name? (ex: atakhq.com | tak-public.atakhq.com )"
 read FQDN
+echo ""
 echo "What is your hostname? (ex: atakhq-com | tak-public-atakhq-com )"
 echo "** Suggest using same value you entered for domain name but replace . with -"
 read HOSTNAME
@@ -29,14 +30,18 @@ sudo certbot certonly --standalone
 #sudo certbot renew --dry-run
 
 
-
+echo ""
+read -p "When prompted for password, use 'atakatak'"
+echo "Press any key to resume setup..."
+echo ""
 
 sudo openssl pkcs12 -export -in /etc/letsencrypt/live/$FQDN/fullchain.pem -inkey /etc/letsencrypt/live/$FQDN/privkey.pem -name $HOSTNAME -out ~/$HOSTNAME.p12
 
 sudo apt install openjdk-16-jre-headless -y
-
-read -p "If asked to save file becuase an existing copy exists, reply Y"
-
+echo ""
+read -p "If asked to save file becuase an existing copy exists, reply Y."
+echo "Press any key to resume setup..."
+echo ""
 sudo keytool -importkeystore -deststorepass atakatak -destkeystore ~/$HOSTNAME.jks -srckeystore ~/$HOSTNAME.p12 -srcstoretype PKCS12
 
 sudo keytool -import -alias bundle -trustcacerts -file /etc/letsencrypt/live/$FQDN/fullchain.pem -keystore ~/$HOSTNAME.jks
