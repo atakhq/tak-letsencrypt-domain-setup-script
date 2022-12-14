@@ -26,7 +26,7 @@ read HOSTNAME
 sudo certbot certonly --standalone
 
 #dry run renew the cert make sure no issues
-sudo certbot renew --dry-run
+#sudo certbot renew --dry-run
 
 
 #login to new root shell and cd to root
