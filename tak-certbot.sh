@@ -12,9 +12,6 @@ sudo ln -s /snap/bin/certbot /usr/bin/certbot
 sudo ufw allow 80/tcp
 sudo ufw reload
 
-#request inital cert
-sudo certbot certonly --standalone
-
 echo "You are about to start the letsencrypt cert generation process. "
 echo "When you are ready press any key to resume and follow instructions on screen to create your keys."
 read -p "Press any key to resume setup..."
@@ -24,6 +21,9 @@ read FQDN
 echo "What is your hostname? (ex: atakhq-com | tak-public-atakhq-com )"
 echo "** Suggest using same value you entered for domain name but replace . with -"
 read HOSTNAME
+
+#request inital cert
+sudo certbot certonly --standalone
 
 #dry run renew the cert make sure no issues
 sudo certbot renew --dry-run
